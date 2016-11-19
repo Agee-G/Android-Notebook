@@ -1,8 +1,11 @@
 package com.bignerdranch.android.notebook;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.LayoutInflaterCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,6 +18,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -23,6 +27,8 @@ import java.util.UUID;
 public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID="crime_id";
+    private static final String DIALOG_DATE="DialogDate";
+    private static final int REQUEST_DATE=0;
     private Crime mCrime;
     private EditText mTitleField;
     private Button mDateButton;
@@ -42,8 +48,7 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         //mCrime=new Crime();
         //getIntent()方法返回用来启动CrimeActivity的intent，然后用intent的getSerializableExtra（String)方法UUID来获取并存入变量crimeId中
-       /* UUID crimeId=(UUID) getActivity().getIntent()
-                .getSerializableExtra(CrimeActivity.EXTRA_CRIME_ID);*/
+
         UUID crimeId=(UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime=CrimeLab.get(getActivity()).getCrime(crimeId);
     }
@@ -73,9 +78,20 @@ public class CrimeFragment extends Fragment {
             }
         });
         mDateButton=(Button)v.findViewById(R.id.crime_date);
-       // mDateButton.setText(mCrime.getDate().toString());
-        mDateButton.setEnabled(false);
+        updateDate();
+        //mDateButton.setEnabled(false);
         //禁用按钮
+        mDateButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                FragmentManager manager=getFragmentManager();
+                //DatePickerFragment dialog=new DatePickerFragment();
+                DatePickerFragment dialog= DatePickerFragment
+                        .newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this,REQUEST_DATE);
+                dialog.show(manager,DIALOG_DATE);
+            }
+        });
         mSolvedCheckBox=(CheckBox)v.findViewById(R.id.crime_solved);
         mSolvedCheckBox.setChecked(mCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -87,6 +103,23 @@ public class CrimeFragment extends Fragment {
         });
 
         return v;
+    }
+
+    private void updateDate() {
+        mDateButton.setText(mCrime.getDate().toString());
+    }
+
+    @Override
+    public void onActivityResult(int requestCode,int resultCode,Intent data){
+        if(resultCode!= Activity.RESULT_OK){
+            return;
+        }
+        if(requestCode==REQUEST_DATE){
+            Date date=(Date) data
+                    .getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+            mCrime.setDate(date);
+            updateDate();
+        }
     }
 
 

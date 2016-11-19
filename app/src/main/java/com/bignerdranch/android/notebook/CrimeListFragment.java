@@ -27,6 +27,7 @@ public class CrimeListFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle saveInstanceState) {
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
+
         mCrimeRecyclerView=(RecyclerView) view
                 .findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -81,9 +82,10 @@ public class CrimeListFragment extends Fragment{
         public void onClick(View v){
            /* Toast.makeText(getActivity(),mCrime.getTitle()+"Hello World!",Toast.LENGTH_SHORT)
             .show();*/
-            //Intent intent=new Intent(getActivity(),CrimeActivity.class);
+
             //现crime ID已安全存储在CrimeActivity的intent中
-            Intent intent=CrimeActivity.newIntent(getActivity(),mCrime.getId());
+
+            Intent intent=CrimePagerActivity.newIntent(getActivity(),mCrime.getId());
             startActivity(intent);
         }
     }
