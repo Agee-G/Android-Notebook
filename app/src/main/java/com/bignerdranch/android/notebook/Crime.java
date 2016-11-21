@@ -41,6 +41,9 @@ public class Crime {
     public String getTitle() {
         return mTitle;
     }
+    public boolean getSolved() {
+        return mSolved;
+    }
 
     public void setTitle(String title) {
         mTitle = title;
